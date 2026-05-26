@@ -260,3 +260,49 @@ body {
     flex: 1;
     overflow: auto;
 }
+
+.props-group {
+    margin-bottom: 15px;
+    padding: 10px;
+}
+
+.props-group label {
+    display: block;
+    font-size: 11px;
+    color: var(--text-dim);
+    margin-bottom: 5px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.props-group input,
+.props-group textarea {
+    width: 100%;
+    background-color: var(--bg-dark);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--text-main);
+    padding: 6px 8px;
+    font-size: 12px;
+}
+
+.props-group input:focus {
+    border-color: var(--accent);
+    outline: none;
+}
+
+.btn-danger {
+    width: 100%;
+    background-color: #d63031;
+    color: white;
+    border: none;
+    padding: 8px;
+    border-radius: 4px;
+    font-weight: 600;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.btn-danger:hover {
+    background-color: #ff7675;
+}
