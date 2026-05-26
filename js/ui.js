@@ -8,6 +8,64 @@ const UI = {
         console.log('UI Module: Initialized');
         this.setupSidebarTabs();
         this.setupAssetSearch();
+        this.setupTopbarActions();
+    },
+
+    /**
+     * Handles topbar buttons like Undo, Redo, Preview, Export
+     */
+    setupTopbarActions: function() {
+        // Undo/Redo
+        const undoBtn = document.getElementById('btn-undo');
+        const redoBtn = document.getElementById('btn-redo');
+
+        if (undoBtn) {
+            undoBtn.addEventListener('click', () => {
+                console.log('UI Module: Undo triggered');
+                // History logic will be implemented in Phase 6
+            });
+        }
+
+        if (redoBtn) {
+            redoBtn.addEventListener('click', () => {
+                console.log('UI Module: Redo triggered');
+                // History logic will be implemented in Phase 6
+            });
+        }
+
+        // Preview
+        const previewBtn = document.getElementById('btn-preview');
+        if (previewBtn) {
+            previewBtn.addEventListener('click', () => {
+                console.log('UI Module: Preview triggered');
+                // Preview modal/system will be implemented in Phase 4
+            });
+        }
+
+        // Export
+        const exportBtn = document.getElementById('btn-export');
+        if (exportBtn) {
+            exportBtn.addEventListener('click', () => {
+                console.log('UI Module: Export triggered');
+                // Export system will be implemented in Phase 7
+            });
+        }
+
+        // Project Name Auto-Save effect
+        const projectNameInput = document.getElementById('project-name');
+        const saveStatus = document.querySelector('.save-status');
+
+        if (projectNameInput && saveStatus) {
+            projectNameInput.addEventListener('input', () => {
+                saveStatus.textContent = 'Saving...';
+
+                // Simulate auto-save delay
+                clearTimeout(this.saveTimeout);
+                this.saveTimeout = setTimeout(() => {
+                    saveStatus.textContent = 'Saved';
+                }, 1000);
+            });
+        }
     },
 
     /**

@@ -21,15 +21,43 @@
     <div id="app">
         <!-- Topbar Module -->
         <header id="topbar">
-            <div class="logo">Animaker<span>Clone</span></div>
-            <div class="project-info">
-                <input type="text" id="project-name" value="Untitled Project">
+            <div class="topbar-left">
+                <div class="logo">Animaker<span>Clone</span></div>
+                <div class="divider"></div>
+                <div class="project-info">
+                    <input type="text" id="project-name" value="Untitled Project" placeholder="Untitled Project">
+                    <span class="save-status">Saved</span>
+                </div>
             </div>
-            <div class="topbar-actions">
-                <button id="btn-undo" title="Undo (Ctrl+Z)">Undo</button>
-                <button id="btn-redo" title="Redo (Ctrl+Y)">Redo</button>
-                <button id="btn-preview" class="primary">Preview</button>
-                <button id="btn-export" class="accent">Export</button>
+
+            <div class="topbar-center">
+                <div class="history-actions">
+                    <button id="btn-undo" class="icon-btn" title="Undo (Ctrl+Z)">
+                        <span class="icon">Undo</span>
+                    </button>
+                    <button id="btn-redo" class="icon-btn" title="Redo (Ctrl+Y)">
+                        <span class="icon">Redo</span>
+                    </button>
+                </div>
+                <div class="divider"></div>
+                <div class="canvas-actions">
+                    <span class="canvas-resolution">1280 x 720 (16:9)</span>
+                </div>
+            </div>
+
+            <div class="topbar-right">
+                <div class="topbar-actions">
+                    <button id="btn-preview" class="btn-secondary" title="Preview Animation">
+                        <span class="icon">▶️</span> Preview
+                    </button>
+                    <button id="btn-export" class="btn-primary" title="Export Video/GIF">
+                        <span class="icon">📥</span> Export
+                    </button>
+                </div>
+                <div class="divider"></div>
+                <div class="user-profile">
+                    <div class="avatar" title="User Profile">A</div>
+                </div>
             </div>
         </header>
 
