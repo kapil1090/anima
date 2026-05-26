@@ -3,39 +3,40 @@
  * Entry point and app initialization.
  */
 
-document.addEventListener('DOMContentLoaded', () => {
-    console.log('Animaker Clone: Initializing foundation...');
+const App = {
+    state: {
+        projectName: 'Untitled Project',
+        currentScene: null,
+        objects: [], // All objects in the current scene
+        selectedObject: null,
+        isPlaying: false,
+        currentTime: 0
+    },
 
-    // Initialize application state
-    const App = {
-        state: {
-            projectName: 'Untitled Project',
-            currentScene: null,
-            selectedObject: null,
-            isPlaying: false,
-            currentTime: 0
-        },
+    init: function() {
+        this.bindEvents();
+        console.log('Animaker Clone: Foundation ready.');
+    },
 
-        init: function() {
-            this.bindEvents();
-            console.log('Animaker Clone: Foundation ready.');
-        },
-
-        bindEvents: function() {
-            // Project name change
-            const nameInput = document.getElementById('project-name');
+    bindEvents: function() {
+        // Project name change
+        const nameInput = document.getElementById('project-name');
+        if (nameInput) {
             nameInput.addEventListener('input', (e) => {
                 this.state.projectName = e.target.value;
             });
-
-            // Button clicks (placeholders)
-            document.getElementById('btn-preview').addEventListener('click', () => {
-                console.log('Preview clicked');
-            });
         }
-    };
 
-    // Global access for debugging
-    window.App = App;
+        // Button clicks (placeholders)
+        document.getElementById('btn-preview')?.addEventListener('click', () => {
+            console.log('Preview clicked');
+        });
+    }
+};
+
+// Global access
+window.App = App;
+
+document.addEventListener('DOMContentLoaded', () => {
     App.init();
 });

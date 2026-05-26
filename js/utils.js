@@ -3,7 +3,7 @@
  * Shared helper functions for the entire application.
  */
 
-const Utils = {
+window.Utils = {
     /**
      * Generates a unique ID
      */
