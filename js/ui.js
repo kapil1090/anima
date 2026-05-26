@@ -147,9 +147,58 @@ const UI = {
 
         if (category === 'characters') {
             this.renderCharacterLibrary();
+        } else if (category === 'backgrounds') {
+            this.renderBackgroundLibrary();
         } else {
             library.innerHTML = `<div class="empty-state">No ${category} found.</div>`;
         }
+    },
+
+    /**
+     * Renders background cards in the sidebar
+     */
+    renderBackgroundLibrary: function() {
+        const library = document.getElementById('asset-library');
+
+        if (!window.Backgrounds || !window.Backgrounds.library) {
+            library.innerHTML = '<div class="empty-state">Background module not loaded.</div>';
+            return;
+        }
+
+        const grid = document.createElement('div');
+        grid.className = 'asset-grid';
+
+        window.Backgrounds.library.forEach(bg => {
+            const card = document.createElement('div');
+            card.className = 'asset-card background-card';
+            card.setAttribute('data-id', bg.id);
+            card.title = `Apply ${bg.name}`;
+
+            let previewStyle = '';
+            if (bg.type === 'color') {
+                previewStyle = `background-color: ${bg.value}`;
+            } else if (bg.type === 'gradient') {
+                previewStyle = `background: linear-gradient(${bg.value[0]}, ${bg.value[1]})`;
+            }
+
+            card.innerHTML = `
+                <div class="asset-preview" style="${previewStyle}"></div>
+                <div class="asset-name">${bg.name}</div>
+                <button class="btn-add-asset">+</button>
+            `;
+
+            card.addEventListener('click', () => {
+                console.log(`UI Module: Setting background to ${bg.id}`);
+                if (window.App) {
+                    window.App.state.background = bg.id;
+                    if (window.Canvas) window.Canvas.render();
+                }
+            });
+
+            grid.appendChild(card);
+        });
+
+        library.appendChild(grid);
     },
 
     /**
@@ -205,6 +254,9 @@ const UI = {
         }
     }
 };
+
+// Global access
+window.UI = UI;
 
 // Initialize UI when the main app starts
 document.addEventListener('DOMContentLoaded', () => {
