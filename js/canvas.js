@@ -66,7 +66,7 @@ const Canvas = {
 
     render: function() {
         this.resize();
-        this.clear();
+        this.drawBackground();
         if (this.showGrid) this.drawGrid();
 
         // Render Objects
@@ -178,9 +178,27 @@ const Canvas = {
         this.canvas.height = this.height;
     },
 
-    clear: function() {
-        this.ctx.fillStyle = '#ffffff';
-        this.ctx.fillRect(0, 0, this.width, this.height);
+    drawBackground: function() {
+        const ctx = this.ctx;
+        const bgId = window.App.state.background;
+        const bg = window.Backgrounds.getBackgroundById(bgId);
+
+        if (!bg) {
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, this.width, this.height);
+            return;
+        }
+
+        if (bg.type === 'color') {
+            ctx.fillStyle = bg.value;
+            ctx.fillRect(0, 0, this.width, this.height);
+        } else if (bg.type === 'gradient') {
+            const gradient = ctx.createLinearGradient(0, 0, 0, this.height);
+            gradient.addColorStop(0, bg.value[0]);
+            gradient.addColorStop(1, bg.value[1]);
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, this.width, this.height);
+        }
     },
 
     drawGrid: function() {

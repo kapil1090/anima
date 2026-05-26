@@ -10,7 +10,8 @@ const App = {
         objects: [], // All objects in the current scene
         selectedObject: null,
         isPlaying: false,
-        currentTime: 0
+        currentTime: 0,
+        background: 'bg_white' // Default background ID
     },
 
     init: function() {
