@@ -9,6 +9,40 @@ const UI = {
         this.setupSidebarTabs();
         this.setupAssetSearch();
         this.setupTopbarActions();
+        this.setupCanvasTools();
+    },
+
+    /**
+     * Handles selection of canvas tools (Select, Hand)
+     */
+    setupCanvasTools: function() {
+        const toolBtns = document.querySelectorAll('.toolbar-group .tool-btn');
+
+        toolBtns.forEach(btn => {
+            if (btn.id.startsWith('tool-')) {
+                btn.addEventListener('click', () => {
+                    const tool = btn.id.replace('tool-', '');
+                    this.switchTool(tool);
+                });
+            }
+        });
+    },
+
+    switchTool: function(tool) {
+        console.log(`UI Module: Switching to ${tool} tool`);
+
+        const toolBtns = document.querySelectorAll('.toolbar-group .tool-btn');
+        toolBtns.forEach(btn => {
+            if (btn.id === `tool-${tool}`) {
+                btn.classList.add('active');
+            } else if (btn.id.startsWith('tool-')) {
+                btn.classList.remove('active');
+            }
+        });
+
+        if (window.App) {
+            window.App.state.currentTool = tool;
+        }
     },
 
     /**

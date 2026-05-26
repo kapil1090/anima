@@ -102,11 +102,33 @@
             <!-- Middle Area (Canvas) -->
             <section id="canvas-area">
                 <div class="canvas-toolbar">
-                    <!-- Tool buttons -->
+                    <div class="toolbar-group">
+                        <button id="tool-select" class="tool-btn active" title="Select Tool (V)">
+                            <span class="icon">Cursor</span>
+                        </button>
+                        <button id="tool-hand" class="tool-btn" title="Hand Tool (H)">
+                            <span class="icon">Hand</span>
+                        </button>
+                    </div>
+                    <div class="divider"></div>
+                    <div class="toolbar-group">
+                        <button id="btn-grid" class="tool-btn" title="Toggle Grid (G)">
+                            <span class="icon">Grid</span>
+                        </button>
+                    </div>
+                    <div class="spacer"></div>
+                    <div class="toolbar-group zoom-controls">
+                        <button id="btn-zoom-out" class="tool-btn" title="Zoom Out">-</button>
+                        <span id="zoom-level">100%</span>
+                        <button id="btn-zoom-in" class="tool-btn" title="Zoom In">+</button>
+                        <button id="btn-zoom-reset" class="tool-btn" title="Reset Zoom">Fit</button>
+                    </div>
                 </div>
-                <div id="viewport">
-                    <!-- The actual animation canvas -->
-                    <canvas id="animation-canvas"></canvas>
+                <div id="canvas-workspace">
+                    <div id="viewport">
+                        <!-- The actual animation canvas -->
+                        <canvas id="animation-canvas"></canvas>
+                    </div>
                 </div>
             </section>
 
