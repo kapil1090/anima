@@ -17,6 +17,7 @@ const Canvas = {
         if (!this.canvas) return;
 
         this.ctx = this.canvas.getContext('2d');
+        this.resize();
         this.setupEventListeners();
         this.startRenderLoop();
 
@@ -42,11 +43,10 @@ const Canvas = {
         document.getElementById('btn-grid')?.addEventListener('click', (e) => {
             this.showGrid = !this.showGrid;
             e.currentTarget.classList.toggle('active', this.showGrid);
-            this.render();
         });
 
         // Resize observer to keep viewport centered if needed
-        window.addEventListener('resize', () => this.render());
+        window.addEventListener('resize', () => this.resize());
     },
 
     setZoom: function(level) {
@@ -65,7 +65,6 @@ const Canvas = {
     },
 
     render: function() {
-        this.resize();
         this.drawBackground();
         if (this.showGrid) this.drawGrid();
 
@@ -74,8 +73,32 @@ const Canvas = {
             window.App.state.objects.forEach(obj => {
                 if (obj.type === 'character') {
                     this.drawCharacter(obj);
+                } else if (obj.type === 'prop') {
+                    this.drawProp(obj);
                 }
             });
+        }
+    },
+
+    addProp: function(propId) {
+        const propData = window.Props.getById(propId);
+        if (!propData) return;
+
+        const newObj = {
+            id: Utils.generateId(),
+            type: 'prop',
+            propId: propId,
+            name: propData.name,
+            x: this.width / 2,
+            y: this.height / 2,
+            scale: 1,
+            rotation: 0,
+            opacity: 1,
+            color: propData.color
+        };
+
+        if (window.App) {
+            window.App.state.objects.push(newObj);
         }
     },
 
@@ -103,6 +126,65 @@ const Canvas = {
             window.App.state.objects.push(newObj);
             this.render();
         }
+    },
+
+    drawProp: function(obj) {
+        const ctx = this.ctx;
+        const s = (obj.scale || 1) * 2;
+
+        ctx.save();
+        ctx.translate(obj.x, obj.y);
+        ctx.rotate(obj.rotation * Math.PI / 180);
+        ctx.globalAlpha = obj.opacity;
+
+        ctx.fillStyle = obj.color;
+
+        if (obj.propId === 'prop_chair') {
+            // Simple Chair
+            ctx.fillRect(-10 * s, 0, 4 * s, 20 * s); // Leg L
+            ctx.fillRect(6 * s, 0, 4 * s, 20 * s); // Leg R
+            ctx.fillRect(-12 * s, -2 * s, 24 * s, 4 * s); // Seat
+            ctx.fillRect(-12 * s, -20 * s, 4 * s, 20 * s); // Back L
+            ctx.fillRect(8 * s, -20 * s, 4 * s, 20 * s); // Back R
+            ctx.fillRect(-12 * s, -20 * s, 24 * s, 4 * s); // Top
+        } else if (obj.propId === 'prop_table') {
+            // Simple Table
+            ctx.fillRect(-20 * s, 0, 4 * s, 25 * s); // Leg L
+            ctx.fillRect(16 * s, 0, 4 * s, 25 * s); // Leg R
+            ctx.fillRect(-25 * s, -5 * s, 50 * s, 8 * s); // Top
+        } else if (obj.propId === 'prop_tree') {
+            // Simple Tree
+            ctx.fillStyle = '#795548'; // Trunk
+            ctx.fillRect(-5 * s, 0, 10 * s, 30 * s);
+            ctx.fillStyle = obj.color; // Leaves
+            ctx.beginPath();
+            ctx.arc(0, -10 * s, 20 * s, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.arc(-15 * s, -25 * s, 15 * s, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.arc(15 * s, -25 * s, 15 * s, 0, Math.PI * 2);
+            ctx.fill();
+        } else if (obj.propId === 'prop_bubble') {
+            // Speech Bubble
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 2;
+            this.drawRoundRect(ctx, -30 * s, -40 * s, 60 * s, 40 * s, 10 * s);
+            ctx.stroke();
+            // Tail
+            ctx.beginPath();
+            ctx.moveTo(-10 * s, 0);
+            ctx.lineTo(0, 10 * s);
+            ctx.lineTo(10 * s, 0);
+            ctx.fill();
+            ctx.stroke();
+        } else {
+            // Fallback square
+            ctx.fillRect(-20 * s, -20 * s, 40 * s, 40 * s);
+        }
+
+        ctx.restore();
     },
 
     drawCharacter: function(obj) {
