@@ -16,21 +16,30 @@ const App = {
 
     init: function() {
         this.bindEvents();
-        console.log('Animaker Clone: Foundation ready.');
+
+        // Auto-load project if exists
+        if (window.Save) {
+            window.Save.loadProject();
+        }
     },
 
     bindEvents: function() {
         // Project name change
         const nameInput = document.getElementById('project-name');
         if (nameInput) {
-            nameInput.addEventListener('input', (e) => {
+            nameInput.addEventListener('change', (e) => {
                 this.state.projectName = e.target.value;
             });
         }
 
-        // Button clicks (placeholders)
+        // Preview button
         document.getElementById('btn-preview')?.addEventListener('click', () => {
-            console.log('Preview clicked');
+            if (window.Timeline) window.Timeline.togglePlay();
+        });
+
+        // Export button
+        document.getElementById('btn-export')?.addEventListener('click', () => {
+            if (window.Save) window.Save.exportJSON();
         });
     }
 };

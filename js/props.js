@@ -11,7 +11,6 @@ const Props = {
     ],
 
     init() {
-        console.log('Props System Initialized');
     },
 
     getById(id) {

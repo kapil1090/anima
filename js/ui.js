@@ -5,7 +5,6 @@
 
 const UI = {
     init: function() {
-        console.log('UI Module: Initialized');
         this.setupSidebarTabs();
         this.setupAssetSearch();
         this.setupTopbarActions();
@@ -13,6 +12,18 @@ const UI = {
 
         // Initial asset load
         this.loadAssets('characters');
+
+        // Properties update loop
+        setInterval(() => this.updatePropertiesPanel(), 500);
+    },
+
+    updateProjectName: function() {
+        if (window.App) {
+            const nameInput = document.getElementById('project-name');
+            if (nameInput) {
+                nameInput.value = window.App.state.projectName;
+            }
+        }
     },
 
     /**
@@ -32,7 +43,6 @@ const UI = {
     },
 
     switchTool: function(tool) {
-        console.log(`UI Module: Switching to ${tool} tool`);
 
         const toolBtns = document.querySelectorAll('.toolbar-group .tool-btn');
         toolBtns.forEach(btn => {
@@ -58,14 +68,12 @@ const UI = {
 
         if (undoBtn) {
             undoBtn.addEventListener('click', () => {
-                console.log('UI Module: Undo triggered');
                 // History logic will be implemented in Phase 6
             });
         }
 
         if (redoBtn) {
             redoBtn.addEventListener('click', () => {
-                console.log('UI Module: Redo triggered');
                 // History logic will be implemented in Phase 6
             });
         }
@@ -74,7 +82,6 @@ const UI = {
         const previewBtn = document.getElementById('btn-preview');
         if (previewBtn) {
             previewBtn.addEventListener('click', () => {
-                console.log('UI Module: Preview triggered');
                 // Preview modal/system will be implemented in Phase 4
             });
         }
@@ -83,7 +90,6 @@ const UI = {
         const exportBtn = document.getElementById('btn-export');
         if (exportBtn) {
             exportBtn.addEventListener('click', () => {
-                console.log('UI Module: Export triggered');
                 // Export system will be implemented in Phase 7
             });
         }
@@ -99,7 +105,7 @@ const UI = {
                 // Simulate auto-save delay
                 clearTimeout(this.saveTimeout);
                 this.saveTimeout = setTimeout(() => {
-                    saveStatus.textContent = 'Saved';
+                    if (window.Save) window.Save.saveProject();
                 }, 1000);
             });
         }
@@ -119,8 +125,110 @@ const UI = {
         });
     },
 
+    updatePropertiesPanel: function() {
+        const panel = document.querySelector('#right-sidebar .panel-content');
+        if (!panel) return;
+
+        const obj = window.App?.state.selectedObject;
+        if (!obj) {
+            if (panel.innerHTML !== '<div class="empty-state">No object selected</div>') {
+                panel.innerHTML = '<div class="empty-state">No object selected</div>';
+                panel.dataset.selectedId = '';
+            }
+            return;
+        }
+
+        // If it's a new object, re-render the whole panel
+        if (panel.dataset.selectedId !== obj.id) {
+            this.renderPropertiesPanel(obj);
+            return;
+        }
+
+        // If it's the same object, just update the input values to avoid focus loss
+        this.syncPropertiesValues(obj);
+    },
+
+    syncPropertiesValues: function(obj) {
+        const inputs = {
+            'prop-name': obj.name,
+            'prop-x': Math.round(obj.x),
+            'prop-y': Math.round(obj.y),
+            'prop-scale': obj.scale || 1,
+            'prop-rotation': Math.round(obj.rotation || 0)
+        };
+
+        for (const [id, val] of Object.entries(inputs)) {
+            const el = document.getElementById(id);
+            if (el && document.activeElement !== el) {
+                el.value = val;
+            }
+        }
+
+        if (obj.type === 'text') {
+            const txt = document.getElementById('prop-text');
+            if (txt && document.activeElement !== txt) txt.value = obj.text;
+            const size = document.getElementById('prop-fontSize');
+            if (size && document.activeElement !== size) size.value = obj.fontSize;
+        }
+    },
+
+    renderPropertiesPanel: function(obj) {
+        const panel = document.querySelector('#right-sidebar .panel-content');
+        panel.dataset.selectedId = obj.id;
+        panel.innerHTML = `
+            <div class="props-group">
+                <label>Name</label>
+                <input id="prop-name" type="text" value="${obj.name}" oninput="window.UI.updateObjProp('name', this.value)">
+            </div>
+            <div class="props-group">
+                <label>Position X</label>
+                <input id="prop-x" type="number" value="${Math.round(obj.x)}" oninput="window.UI.updateObjProp('x', parseFloat(this.value))">
+            </div>
+            <div class="props-group">
+                <label>Position Y</label>
+                <input id="prop-y" type="number" value="${Math.round(obj.y)}" oninput="window.UI.updateObjProp('y', parseFloat(this.value))">
+            </div>
+            <div class="props-group">
+                <label>Scale</label>
+                <input id="prop-scale" type="range" min="0.1" max="5" step="0.1" value="${obj.scale || 1}" oninput="window.UI.updateObjProp('scale', parseFloat(this.value))">
+            </div>
+            <div class="props-group">
+                <label>Rotation</label>
+                <input id="prop-rotation" type="number" value="${Math.round(obj.rotation || 0)}" oninput="window.UI.updateObjProp('rotation', parseFloat(this.value))">
+            </div>
+            ${obj.type === 'text' ? `
+                <div class="props-group">
+                    <label>Text Content</label>
+                    <textarea id="prop-text" oninput="window.UI.updateObjProp('text', this.value)">${obj.text}</textarea>
+                </div>
+                <div class="props-group">
+                    <label>Font Size</label>
+                    <input id="prop-fontSize" type="number" value="${obj.fontSize}" oninput="window.UI.updateObjProp('fontSize', parseFloat(this.value))">
+                </div>
+            ` : ''}
+            <div class="props-group">
+                <button class="btn-danger" onclick="window.UI.deleteSelected()">Delete Object</button>
+            </div>
+        `;
+    },
+
+    updateObjProp: function(prop, value) {
+        const obj = window.App?.state.selectedObject;
+        if (obj) {
+            obj[prop] = value;
+        }
+    },
+
+    deleteSelected: function() {
+        const obj = window.App?.state.selectedObject;
+        if (obj && window.App) {
+            window.App.state.objects = window.App.state.objects.filter(o => o.id !== obj.id);
+            window.App.state.selectedObject = null;
+            if (window.Timeline) window.Timeline.update(true);
+        }
+    },
+
     switchSidebarTab: function(tabName) {
-        console.log(`UI Module: Switching to ${tabName} tab`);
 
         // Update Active State in Nav
         const navItems = document.querySelectorAll('#left-sidebar .nav-item');
@@ -151,9 +259,24 @@ const UI = {
             this.renderBackgroundLibrary();
         } else if (category === 'props') {
             this.renderPropsLibrary();
+        } else if (category === 'text') {
+            this.renderTextLibrary();
         } else {
             library.innerHTML = `<div class="empty-state">No ${category} found.</div>`;
         }
+    },
+
+    renderTextLibrary: function() {
+        const library = document.getElementById('asset-library');
+        library.innerHTML = `
+            <div class="asset-grid">
+                <div class="asset-card text-card" title="Add Text">
+                    <div class="asset-preview">T</div>
+                    <div class="asset-name">Add Text</div>
+                    <button class="btn-add-asset" onclick="window.Text.addText()">+</button>
+                </div>
+            </div>
+        `;
     },
 
     /**
@@ -183,7 +306,6 @@ const UI = {
             `;
 
             card.addEventListener('click', () => {
-                console.log(`UI Module: Adding prop ${prop.id} to scene`);
                 if (window.Canvas && window.Canvas.addProp) {
                     window.Canvas.addProp(prop.id);
                 }
@@ -229,7 +351,6 @@ const UI = {
             `;
 
             card.addEventListener('click', () => {
-                console.log(`UI Module: Setting background to ${bg.id}`);
                 if (window.App) {
                     window.App.state.background = bg.id;
                     if (window.Canvas) window.Canvas.render();
@@ -271,7 +392,6 @@ const UI = {
             `;
 
             card.addEventListener('click', () => {
-                console.log(`UI Module: Adding character ${char.id} to scene`);
                 // Logic for adding to canvas will be in Phase 2 Step 6 next
                 if (window.Canvas && window.Canvas.addCharacter) {
                     window.Canvas.addCharacter(char.id);
@@ -289,7 +409,6 @@ const UI = {
         if (searchInput) {
             searchInput.addEventListener('input', (e) => {
                 const query = e.target.value.toLowerCase();
-                console.log(`UI Module: Searching for "${query}"`);
                 // Search logic will be implemented in Phase 2
             });
         }

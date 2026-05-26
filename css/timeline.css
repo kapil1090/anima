@@ -115,6 +115,23 @@
     overflow-y: auto;
 }
 
+.layer-item {
+    height: 40px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    padding: 0 12px;
+    font-size: 12px;
+    color: var(--text-dim);
+    cursor: pointer;
+}
+
+.layer-item.selected {
+    background-color: rgba(108, 99, 255, 0.2);
+    color: var(--text-main);
+    border-left: 3px solid var(--accent);
+}
+
 .empty-layers {
     padding: 20px;
     font-size: 11px;
@@ -138,12 +155,54 @@
     position: sticky;
     top: 0;
     z-index: 5;
-    background-image: linear-gradient(to right, var(--border) 1px, transparent 1px);
-    background-size: 50px 100%; /* Size matches gridSize in Canvas logic */
+}
+
+.ruler-mark {
+    position: absolute;
+    top: 0;
+    width: 1px;
+    height: 8px;
+    background-color: var(--text-muted);
+}
+
+.ruler-mark span {
+    position: absolute;
+    top: 10px;
+    left: -10px;
+    font-size: 9px;
+    color: var(--text-dim);
 }
 
 #track-list {
     min-height: 100%;
+}
+
+.track-item {
+    height: 40px;
+    border-bottom: 1px solid #222;
+    position: relative;
+    cursor: cell;
+}
+
+.track-item:hover {
+    background-color: rgba(255,255,255,0.02);
+}
+
+.keyframe {
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%, -50%) rotate(45deg);
+    width: 10px;
+    height: 10px;
+    background-color: var(--accent);
+    border: 2px solid white;
+    cursor: pointer;
+    z-index: 2;
+}
+
+.keyframe:hover {
+    background-color: white;
+    border-color: var(--accent);
 }
 
 .track-placeholder {

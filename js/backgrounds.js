@@ -13,7 +13,6 @@ const Backgrounds = {
     ],
 
     init() {
-        console.log('Background System Initialized');
     },
 
     getBackgroundById(id) {

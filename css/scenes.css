@@ -1,0 +1,15 @@
+/* =========================
+   SCENE MANAGEMENT STYLES
+========================= */
+
+.scene-item {
+    padding: 10px;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    font-size: 13px;
+}
+
+.scene-item.active {
+    background-color: var(--accent);
+    color: white;
+}
