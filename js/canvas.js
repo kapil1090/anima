@@ -18,9 +18,18 @@ const Canvas = {
 
         this.ctx = this.canvas.getContext('2d');
         this.setupEventListeners();
-        this.render();
+        this.startRenderLoop();
 
+        window.Canvas = this; // Expose to global for UI interaction
         console.log('Canvas Module: Initialized');
+    },
+
+    startRenderLoop: function() {
+        const loop = () => {
+            this.render();
+            requestAnimationFrame(loop);
+        };
+        requestAnimationFrame(loop);
     },
 
     setupEventListeners: function() {
@@ -60,8 +69,108 @@ const Canvas = {
         this.clear();
         if (this.showGrid) this.drawGrid();
 
-        // Final render call will eventually involve scenes and objects
-        console.log('Canvas Module: Rendered frame');
+        // Render Objects
+        if (window.App && window.App.state.objects) {
+            window.App.state.objects.forEach(obj => {
+                if (obj.type === 'character') {
+                    this.drawCharacter(obj);
+                }
+            });
+        }
+    },
+
+    addCharacter: function(charId) {
+        const charData = window.Characters.getById(charId);
+        if (!charData) return;
+
+        const newObj = {
+            id: Utils.generateId(),
+            type: 'character',
+            charId: charId,
+            name: charData.name,
+            x: this.width / 2,
+            y: this.height / 2,
+            scale: 1,
+            rotation: 0,
+            opacity: 1,
+            skinColor: charData.skinColor,
+            outfitColor: charData.outfitColor,
+            hairColor: charData.hairColor,
+            animation: 'idle'
+        };
+
+        if (window.App) {
+            window.App.state.objects.push(newObj);
+            this.render();
+        }
+    },
+
+    drawCharacter: function(obj) {
+        const ctx = this.ctx;
+        const s = (obj.scale || 1) * 2; // Increased base size for visibility
+
+        ctx.save();
+        ctx.translate(obj.x, obj.y);
+        ctx.rotate(obj.rotation * Math.PI / 180);
+        ctx.globalAlpha = obj.opacity;
+
+        // Simple humanoid drawing (modularized for future animations)
+        const bob = Math.sin(Date.now() * 0.005) * 5; // Idle bobbing
+        ctx.translate(0, bob);
+
+        // Legs
+        ctx.fillStyle = obj.outfitColor;
+        ctx.fillRect(-12 * s, 35 * s, 10 * s, 15 * s);
+        ctx.fillRect(2 * s, 35 * s, 10 * s, 15 * s);
+
+        // Body
+        ctx.fillStyle = obj.outfitColor;
+        this.drawRoundRect(ctx, -20 * s, 0, 40 * s, 40 * s, 8 * s);
+
+        // Head
+        ctx.fillStyle = obj.skinColor;
+        ctx.beginPath();
+        ctx.arc(0, -22 * s, 18 * s, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Hair (if any)
+        if (obj.hairColor) {
+            ctx.fillStyle = obj.hairColor;
+            ctx.beginPath();
+            ctx.arc(0, -26 * s, 20 * s, Math.PI, 0);
+            ctx.fill();
+        }
+
+        // Eyes
+        ctx.fillStyle = '#000000';
+        ctx.beginPath();
+        ctx.arc(-6 * s, -22 * s, 2 * s, 0, Math.PI * 2);
+        ctx.arc(6 * s, -22 * s, 2 * s, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Mouth (simple smile)
+        ctx.strokeStyle = '#000000';
+        ctx.lineWidth = 1 * s;
+        ctx.beginPath();
+        ctx.arc(0, -18 * s, 5 * s, 0.2 * Math.PI, 0.8 * Math.PI);
+        ctx.stroke();
+
+        ctx.restore();
+    },
+
+    drawRoundRect: function(ctx, x, y, width, height, radius) {
+        ctx.beginPath();
+        ctx.moveTo(x + radius, y);
+        ctx.lineTo(x + width - radius, y);
+        ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+        ctx.lineTo(x + width, y + height - radius);
+        ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+        ctx.lineTo(x + radius, y + height);
+        ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+        ctx.lineTo(x, y + radius);
+        ctx.quadraticCurveTo(x, y, x + radius, y);
+        ctx.closePath();
+        ctx.fill();
     },
 
     resize: function() {

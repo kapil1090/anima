@@ -10,6 +10,9 @@ const UI = {
         this.setupAssetSearch();
         this.setupTopbarActions();
         this.setupCanvasTools();
+
+        // Initial asset load
+        this.loadAssets('characters');
     },
 
     /**
@@ -140,13 +143,55 @@ const UI = {
 
     loadAssets: function(category) {
         const library = document.getElementById('asset-library');
-        // This will be implemented in the Asset Library module (Phase 2)
-        library.innerHTML = `<div class="empty-state">Loading ${category}...</div>`;
+        library.innerHTML = ''; // Clear current view
 
-        // Simulating loading for now
-        setTimeout(() => {
+        if (category === 'characters') {
+            this.renderCharacterLibrary();
+        } else {
             library.innerHTML = `<div class="empty-state">No ${category} found.</div>`;
-        }, 300);
+        }
+    },
+
+    /**
+     * Renders character cards in the sidebar
+     */
+    renderCharacterLibrary: function() {
+        const library = document.getElementById('asset-library');
+
+        if (!window.Characters || !window.Characters.library) {
+            library.innerHTML = '<div class="empty-state">Character module not loaded.</div>';
+            return;
+        }
+
+        const grid = document.createElement('div');
+        grid.className = 'asset-grid';
+
+        window.Characters.library.forEach(char => {
+            const card = document.createElement('div');
+            card.className = 'asset-card character-card';
+            card.setAttribute('data-id', char.id);
+            card.title = `Add ${char.name}`;
+
+            card.innerHTML = `
+                <div class="asset-preview">
+                    <span class="avatar-placeholder" style="background-color: ${char.outfitColor}"></span>
+                </div>
+                <div class="asset-name">${char.name}</div>
+                <button class="btn-add-asset">+</button>
+            `;
+
+            card.addEventListener('click', () => {
+                console.log(`UI Module: Adding character ${char.id} to scene`);
+                // Logic for adding to canvas will be in Phase 2 Step 6 next
+                if (window.Canvas && window.Canvas.addCharacter) {
+                    window.Canvas.addCharacter(char.id);
+                }
+            });
+
+            grid.appendChild(card);
+        });
+
+        library.appendChild(grid);
     },
 
     setupAssetSearch: function() {
