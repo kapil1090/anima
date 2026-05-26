@@ -149,9 +149,50 @@ const UI = {
             this.renderCharacterLibrary();
         } else if (category === 'backgrounds') {
             this.renderBackgroundLibrary();
+        } else if (category === 'props') {
+            this.renderPropsLibrary();
         } else {
             library.innerHTML = `<div class="empty-state">No ${category} found.</div>`;
         }
+    },
+
+    /**
+     * Renders props cards in the sidebar
+     */
+    renderPropsLibrary: function() {
+        const library = document.getElementById('asset-library');
+
+        if (!window.Props || !window.Props.library) {
+            library.innerHTML = '<div class="empty-state">Props module not loaded.</div>';
+            return;
+        }
+
+        const grid = document.createElement('div');
+        grid.className = 'asset-grid';
+
+        window.Props.library.forEach(prop => {
+            const card = document.createElement('div');
+            card.className = 'asset-card prop-card';
+            card.setAttribute('data-id', prop.id);
+            card.title = `Add ${prop.name}`;
+
+            card.innerHTML = `
+                <div class="asset-preview" style="background-color: ${prop.color}"></div>
+                <div class="asset-name">${prop.name}</div>
+                <button class="btn-add-asset">+</button>
+            `;
+
+            card.addEventListener('click', () => {
+                console.log(`UI Module: Adding prop ${prop.id} to scene`);
+                if (window.Canvas && window.Canvas.addProp) {
+                    window.Canvas.addProp(prop.id);
+                }
+            });
+
+            grid.appendChild(card);
+        });
+
+        library.appendChild(grid);
     },
 
     /**
