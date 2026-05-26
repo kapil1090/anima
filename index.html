@@ -37,10 +37,37 @@
             <!-- Left Sidebar (Assets & Library) -->
             <aside id="left-sidebar">
                 <nav class="sidebar-nav">
-                    <!-- Nav items will be added in sidebar module -->
+                    <button class="nav-item active" data-tab="characters" title="Characters">
+                        <span class="icon">👤</span>
+                        <span class="label">Characters</span>
+                    </button>
+                    <button class="nav-item" data-tab="props" title="Props">
+                        <span class="icon">🎁</span>
+                        <span class="label">Props</span>
+                    </button>
+                    <button class="nav-item" data-tab="backgrounds" title="Backgrounds">
+                        <span class="icon">🖼️</span>
+                        <span class="label">BG</span>
+                    </button>
+                    <button class="nav-item" data-tab="text" title="Text">
+                        <span class="icon">T</span>
+                        <span class="label">Text</span>
+                    </button>
+                    <button class="nav-item" data-tab="audio" title="Audio">
+                        <span class="icon">🎵</span>
+                        <span class="label">Audio</span>
+                    </button>
                 </nav>
                 <div class="sidebar-content">
-                    <!-- Asset library content -->
+                    <div class="search-box">
+                        <input type="text" id="asset-search" placeholder="Search assets...">
+                    </div>
+                    <div id="asset-library">
+                        <!-- Asset items will be dynamically loaded here -->
+                        <div class="empty-state">
+                            Select a category to view assets
+                        </div>
+                    </div>
                 </div>
             </aside>
 
