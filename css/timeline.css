@@ -127,7 +127,7 @@
 }
 
 .layer-item.selected {
-    background-color: rgba(108, 99, 255, 0.2);
+    background-color: rgba(0, 168, 255, 0.1);
     color: var(--text-main);
     border-left: 3px solid var(--accent);
 }
@@ -144,13 +144,13 @@
 .timeline-tracks {
     flex: 1;
     overflow: auto;
-    background-color: #121212;
+    background-color: var(--bg-dark);
     position: relative;
 }
 
 .timeline-ruler {
     height: 30px;
-    background-color: #1a1a1a;
+    background-color: var(--bg-panel);
     border-bottom: 1px solid var(--border);
     position: sticky;
     top: 0;
@@ -179,13 +179,13 @@
 
 .track-item {
     height: 40px;
-    border-bottom: 1px solid #222;
+    border-bottom: 1px solid var(--border-light);
     position: relative;
     cursor: cell;
 }
 
 .track-item:hover {
-    background-color: rgba(255,255,255,0.02);
+    background-color: rgba(0, 0, 0, 0.02);
 }
 
 .keyframe {
@@ -207,7 +207,7 @@
 
 .track-placeholder {
     height: 40px;
-    border-bottom: 1px solid #222;
+    border-bottom: 1px solid var(--border-light);
 }
 
 /* Playhead */
