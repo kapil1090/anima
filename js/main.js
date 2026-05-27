@@ -36,11 +36,6 @@ const App = {
         document.getElementById('btn-preview')?.addEventListener('click', () => {
             if (window.Timeline) window.Timeline.togglePlay();
         });
-
-        // Export button
-        document.getElementById('btn-export')?.addEventListener('click', () => {
-            if (window.Save) window.Save.exportJSON();
-        });
     }
 };
 

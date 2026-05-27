@@ -24,16 +24,6 @@ const Save = {
         }
     },
 
-    exportJSON() {
-        if (!window.App) return;
-        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(window.App.state));
-        const downloadAnchorNode = document.createElement('a');
-        downloadAnchorNode.setAttribute("href",     dataStr);
-        downloadAnchorNode.setAttribute("download", "project.json");
-        document.body.appendChild(downloadAnchorNode);
-        downloadAnchorNode.click();
-        downloadAnchorNode.remove();
-    }
 };
 
 // Export to window

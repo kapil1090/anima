@@ -14,7 +14,7 @@ const UI = {
         this.loadAssets('characters');
 
         // Properties update loop
-        setInterval(() => this.updatePropertiesPanel(), 500);
+        setInterval(() => this.updatePropertiesPanel(), 100);
     },
 
     updateProjectName: function() {
@@ -207,15 +207,41 @@ const UI = {
                 </div>
             ` : ''}
             <div class="props-group">
+                <label>Layers</label>
+                <div style="display: flex; gap: 5px;">
+                    <button class="icon-btn" style="flex: 1" onclick="window.UI.reorderObject('up')">Bring Forward</button>
+                    <button class="icon-btn" style="flex: 1" onclick="window.UI.reorderObject('down')">Send Backward</button>
+                </div>
+            </div>
+            <div class="props-group">
                 <button class="btn-danger" onclick="window.UI.deleteSelected()">Delete Object</button>
             </div>
         `;
+    },
+
+    reorderObject: function(direction) {
+        const obj = window.App?.state.selectedObject;
+        if (!obj || !window.App) return;
+
+        const objects = window.App.state.objects;
+        const index = objects.indexOf(obj);
+
+        if (direction === 'up' && index < objects.length - 1) {
+            [objects[index], objects[index + 1]] = [objects[index + 1], objects[index]];
+        } else if (direction === 'down' && index > 0) {
+            [objects[index], objects[index - 1]] = [objects[index - 1], objects[index]];
+        }
+
+        if (window.Timeline) window.Timeline.update(true);
     },
 
     updateObjProp: function(prop, value) {
         const obj = window.App?.state.selectedObject;
         if (obj) {
             obj[prop] = value;
+            if (prop === 'name' && window.Timeline) {
+                window.Timeline.update(true); // Force UI refresh for layer name
+            }
         }
     },
 
@@ -261,6 +287,8 @@ const UI = {
             this.renderPropsLibrary();
         } else if (category === 'text') {
             this.renderTextLibrary();
+        } else if (category === 'scenes') {
+            this.renderSceneLibrary();
         } else {
             library.innerHTML = `<div class="empty-state">No ${category} found.</div>`;
         }
@@ -277,6 +305,27 @@ const UI = {
                 </div>
             </div>
         `;
+    },
+
+    renderSceneLibrary: function() {
+        const library = document.getElementById('asset-library');
+        if (!window.Scenes) return;
+
+        let scenesHtml = `
+            <div class="asset-grid">
+                ${window.Scenes.scenes.map((scene, index) => `
+                    <div class="asset-card ${window.Scenes.currentSceneIndex === index ? 'active' : ''}" onclick="window.Scenes.switchScene(${index})">
+                        <div class="asset-preview">🎞️</div>
+                        <div class="asset-name">${scene.name}</div>
+                    </div>
+                `).join('')}
+                <div class="asset-card" onclick="window.Scenes.addScene()">
+                    <div class="asset-preview">+</div>
+                    <div class="asset-name">Add Scene</div>
+                </div>
+            </div>
+        `;
+        library.innerHTML = scenesHtml;
     },
 
     /**

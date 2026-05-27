@@ -116,20 +116,16 @@ const Canvas = {
     },
 
     isPointInObject: function(x, y, obj) {
-        const s = (obj.scale || 1) * 2;
-        let w = 40 * s;
-        let h = 80 * s; // Default character size approx
+        const { w, h } = this.getObjectBounds(obj);
 
-        if (obj.type === 'prop') {
-            if (obj.propId === 'prop_table') { w = 50 * s; h = 30 * s; }
-            else if (obj.propId === 'prop_tree') { w = 40 * s; h = 60 * s; }
-            else if (obj.propId === 'prop_bubble') { w = 60 * s; h = 50 * s; }
-            else { w = 40 * s; h = 40 * s; }
-        }
+        // Rotate point (x, y) back by obj.rotation around (obj.x, obj.y)
+        const rad = -obj.rotation * Math.PI / 180;
+        const dx = x - obj.x;
+        const dy = y - obj.y;
+        const rx = dx * Math.cos(rad) - dy * Math.sin(rad);
+        const ry = dx * Math.sin(rad) + dy * Math.cos(rad);
 
-        // Basic AABB hit detection (can be refined)
-        return x >= obj.x - w/2 && x <= obj.x + w/2 &&
-               y >= obj.y - h/2 && y <= obj.y + h/2;
+        return rx >= -w/2 && rx <= w/2 && ry >= -h/2 && ry <= h/2;
     },
 
     setZoom: function(level) {
@@ -376,6 +372,9 @@ const Canvas = {
         ctx.rotate(obj.rotation * Math.PI / 180);
         ctx.globalAlpha = obj.opacity;
 
+        const charData = window.Characters.getById(obj.charId);
+        const isRobot = charData && charData.category === 'Robot';
+
         // Animation state
         const time = Date.now() * 0.005;
         let bob = 0;
@@ -392,16 +391,21 @@ const Canvas = {
 
         ctx.translate(0, bob);
 
-        // Legs (Pants/Shoes)
+        // Legs
         ctx.fillStyle = obj.outfitColor;
         // Left Leg
         ctx.save();
         ctx.translate(-8 * s, 35 * s);
         ctx.rotate(legSwing * Math.PI / 180);
-        ctx.fillRect(-5 * s, 0, 10 * s, 15 * s);
-        // Shoe
-        ctx.fillStyle = '#333';
-        ctx.fillRect(-6 * s, 12 * s, 12 * s, 4 * s);
+        if (isRobot) {
+            ctx.fillRect(-4 * s, 0, 8 * s, 15 * s);
+            ctx.fillStyle = '#555';
+            ctx.fillRect(-5 * s, 10 * s, 10 * s, 5 * s);
+        } else {
+            ctx.fillRect(-5 * s, 0, 10 * s, 15 * s);
+            ctx.fillStyle = '#333';
+            ctx.fillRect(-6 * s, 12 * s, 12 * s, 4 * s);
+        }
         ctx.restore();
 
         // Right Leg
@@ -409,10 +413,15 @@ const Canvas = {
         ctx.save();
         ctx.translate(8 * s, 35 * s);
         ctx.rotate(-legSwing * Math.PI / 180);
-        ctx.fillRect(-5 * s, 0, 10 * s, 15 * s);
-        // Shoe
-        ctx.fillStyle = '#333';
-        ctx.fillRect(-6 * s, 12 * s, 12 * s, 4 * s);
+        if (isRobot) {
+            ctx.fillRect(-4 * s, 0, 8 * s, 15 * s);
+            ctx.fillStyle = '#555';
+            ctx.fillRect(-5 * s, 10 * s, 10 * s, 5 * s);
+        } else {
+            ctx.fillRect(-5 * s, 0, 10 * s, 15 * s);
+            ctx.fillStyle = '#333';
+            ctx.fillRect(-6 * s, 12 * s, 12 * s, 4 * s);
+        }
         ctx.restore();
 
         // Arms (Behind body)
@@ -422,59 +431,106 @@ const Canvas = {
         ctx.translate(-22 * s, 10 * s);
         ctx.rotate(-armSwing * Math.PI / 180);
         ctx.fillRect(-4 * s, 0, 8 * s, 25 * s);
+        if (isRobot) {
+            ctx.fillStyle = '#777';
+            ctx.fillRect(-5 * s, 20 * s, 10 * s, 8 * s);
+        }
         ctx.restore();
 
         // Right Arm
+        ctx.fillStyle = obj.skinColor;
         ctx.save();
         ctx.translate(22 * s, 10 * s);
         ctx.rotate(armSwing * Math.PI / 180);
         ctx.fillRect(-4 * s, 0, 8 * s, 25 * s);
+        if (isRobot) {
+            ctx.fillStyle = '#777';
+            ctx.fillRect(-5 * s, 20 * s, 10 * s, 8 * s);
+        }
         ctx.restore();
 
-        // Body (Shirt/Outfit)
+        // Body
         ctx.fillStyle = obj.outfitColor;
-        this.drawRoundRect(ctx, -20 * s, 0, 40 * s, 40 * s, 10 * s);
+        if (isRobot) {
+            ctx.fillRect(-20 * s, 0, 40 * s, 40 * s);
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 1 * s;
+            ctx.strokeRect(-20 * s, 0, 40 * s, 40 * s);
+            // Robot Chest Panel
+            ctx.fillStyle = '#eee';
+            ctx.fillRect(-12 * s, 8 * s, 24 * s, 12 * s);
+            ctx.fillStyle = '#ff4757';
+            ctx.beginPath();
+            ctx.arc(-6 * s, 14 * s, 2 * s, 0, Math.PI * 2);
+            ctx.fill();
+        } else {
+            this.drawRoundRect(ctx, -20 * s, 0, 40 * s, 40 * s, 10 * s);
+        }
 
         // Neck
         ctx.fillStyle = obj.skinColor;
         ctx.fillRect(-5 * s, -5 * s, 10 * s, 10 * s);
 
         // Head
-        ctx.beginPath();
-        ctx.arc(0, -22 * s, 18 * s, 0, Math.PI * 2);
-        ctx.fill();
-
-        // Hair
-        if (obj.hairColor) {
-            ctx.fillStyle = obj.hairColor;
+        if (isRobot) {
+            ctx.fillStyle = obj.skinColor;
+            ctx.fillRect(-15 * s, -35 * s, 30 * s, 30 * s);
+            ctx.strokeStyle = '#333';
+            ctx.strokeRect(-15 * s, -35 * s, 30 * s, 30 * s);
+            // Antennas
             ctx.beginPath();
-            ctx.arc(0, -25 * s, 20 * s, Math.PI, 0);
+            ctx.moveTo(0, -35 * s);
+            ctx.lineTo(0, -45 * s);
+            ctx.stroke();
+            ctx.fillStyle = '#f1c40f';
+            ctx.beginPath();
+            ctx.arc(0, -45 * s, 3 * s, 0, Math.PI * 2);
             ctx.fill();
-            // Sideburns / Back of hair
-            ctx.fillRect(-20 * s, -25 * s, 5 * s, 10 * s);
-            ctx.fillRect(15 * s, -25 * s, 5 * s, 10 * s);
+        } else {
+            ctx.fillStyle = obj.skinColor;
+            ctx.beginPath();
+            ctx.arc(0, -22 * s, 18 * s, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Hair
+            if (obj.hairColor) {
+                ctx.fillStyle = obj.hairColor;
+                ctx.beginPath();
+                ctx.arc(0, -25 * s, 20 * s, Math.PI, 0);
+                ctx.fill();
+                ctx.fillRect(-20 * s, -25 * s, 5 * s, 10 * s);
+                ctx.fillRect(15 * s, -25 * s, 5 * s, 10 * s);
+            }
         }
 
         // Face Details
-        // Eyes
-        ctx.fillStyle = '#fff';
-        ctx.beginPath();
-        ctx.arc(-7 * s, -23 * s, 4 * s, 0, Math.PI * 2);
-        ctx.arc(7 * s, -23 * s, 4 * s, 0, Math.PI * 2);
-        ctx.fill();
+        if (isRobot) {
+            ctx.fillStyle = '#00d2ff'; // Glowing eyes
+            ctx.fillRect(-8 * s, -28 * s, 6 * s, 6 * s);
+            ctx.fillRect(2 * s, -28 * s, 6 * s, 6 * s);
+            ctx.fillStyle = '#333';
+            ctx.fillRect(-8 * s, -15 * s, 16 * s, 2 * s);
+        } else {
+            // Eyes
+            ctx.fillStyle = '#fff';
+            ctx.beginPath();
+            ctx.arc(-7 * s, -23 * s, 4 * s, 0, Math.PI * 2);
+            ctx.arc(7 * s, -23 * s, 4 * s, 0, Math.PI * 2);
+            ctx.fill();
 
-        ctx.fillStyle = '#000';
-        ctx.beginPath();
-        ctx.arc(-7 * s, -23 * s, 2 * s, 0, Math.PI * 2);
-        ctx.arc(7 * s, -23 * s, 2 * s, 0, Math.PI * 2);
-        ctx.fill();
+            ctx.fillStyle = '#000';
+            ctx.beginPath();
+            ctx.arc(-7 * s, -23 * s, 2 * s, 0, Math.PI * 2);
+            ctx.arc(7 * s, -23 * s, 2 * s, 0, Math.PI * 2);
+            ctx.fill();
 
-        // Smile
-        ctx.strokeStyle = '#000';
-        ctx.lineWidth = 1.5 * s;
-        ctx.beginPath();
-        ctx.arc(0, -18 * s, 6 * s, 0.1 * Math.PI, 0.9 * Math.PI);
-        ctx.stroke();
+            // Smile
+            ctx.strokeStyle = '#000';
+            ctx.lineWidth = 1.5 * s;
+            ctx.beginPath();
+            ctx.arc(0, -18 * s, 6 * s, 0.1 * Math.PI, 0.9 * Math.PI);
+            ctx.stroke();
+        }
 
         ctx.restore();
     },

@@ -22,6 +22,9 @@ const Scenes = {
             background: 'bg_white'
         };
         this.scenes.push(newScene);
+        if (window.UI && window.App && window.App.state.currentTab === 'scenes') {
+            window.UI.renderSceneLibrary();
+        }
         return newScene;
     },
 
@@ -40,7 +43,13 @@ const Scenes = {
                 window.App.state.selectedObject = null;
 
                 if (window.Canvas) window.Canvas.render();
-                if (window.Timeline) window.Timeline.update(true);
+                if (window.Timeline) {
+                    window.Timeline.currentTime = 0;
+                    window.Timeline.update(true);
+                }
+                if (window.UI && window.App.state.currentTab === 'scenes') {
+                    window.UI.renderSceneLibrary();
+                }
             }
         }
     }
