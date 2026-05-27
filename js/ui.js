@@ -409,9 +409,21 @@ const UI = {
         if (searchInput) {
             searchInput.addEventListener('input', (e) => {
                 const query = e.target.value.toLowerCase();
-                // Search logic will be implemented in Phase 2
+                this.filterAssets(query);
             });
         }
+    },
+
+    filterAssets: function(query) {
+        const cards = document.querySelectorAll('.asset-card');
+        cards.forEach(card => {
+            const name = card.querySelector('.asset-name').textContent.toLowerCase();
+            if (name.includes(query)) {
+                card.style.display = 'flex';
+            } else {
+                card.style.display = 'none';
+            }
+        });
     }
 };
 

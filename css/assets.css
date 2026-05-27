@@ -25,7 +25,7 @@
 .asset-card:hover {
     border-color: var(--accent);
     transform: translateY(-2px);
-    background-color: rgba(108, 99, 255, 0.05);
+    background-color: rgba(0, 168, 255, 0.05);
 }
 
 .asset-card .asset-preview {

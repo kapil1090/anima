@@ -35,12 +35,12 @@
 
 .nav-item:hover {
     color: var(--text-main);
-    background-color: rgba(255, 255, 255, 0.05);
+    background-color: rgba(0, 0, 0, 0.05);
 }
 
 .nav-item.active {
     color: var(--accent);
-    background-color: rgba(108, 99, 255, 0.1);
+    background-color: rgba(0, 168, 255, 0.1);
     border-left-color: var(--accent);
 }
 

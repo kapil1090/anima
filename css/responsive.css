@@ -1,0 +1,35 @@
+/* =========================
+   RESPONSIVE DESIGN
+========================= */
+
+/* Adjust for smaller laptop screens */
+@media screen and (max-height: 800px) {
+    :root {
+        --timeline-height: 200px;
+        --topbar-height: 40px;
+    }
+}
+
+/* Sidebar collapsing for narrow viewports */
+@media screen and (max-width: 1024px) {
+    :root {
+        --sidebar-left-width: 220px;
+        --sidebar-right-width: 240px;
+    }
+}
+
+/* Mobile basic support (though primarily a desktop editor) */
+@media screen and (max-width: 768px) {
+    #editor-container {
+        flex-direction: column;
+    }
+
+    #left-sidebar, #right-sidebar {
+        width: 100%;
+        height: auto;
+    }
+
+    #canvas-area {
+        height: 400px;
+    }
+}

@@ -369,52 +369,111 @@ const Canvas = {
 
     drawCharacter: function(obj) {
         const ctx = this.ctx;
-        const s = (obj.scale || 1) * 2; // Increased base size for visibility
+        const s = (obj.scale || 1) * 2;
 
         ctx.save();
         ctx.translate(obj.x, obj.y);
         ctx.rotate(obj.rotation * Math.PI / 180);
         ctx.globalAlpha = obj.opacity;
 
-        // Simple humanoid drawing (modularized for future animations)
-        const bob = Math.sin(Date.now() * 0.005) * 5; // Idle bobbing
+        // Animation state
+        const time = Date.now() * 0.005;
+        let bob = 0;
+        let legSwing = 0;
+        let armSwing = 0;
+
+        if (window.App && window.App.state.isPlaying) {
+            bob = Math.sin(time * 2) * 3 * s;
+            legSwing = Math.sin(time * 2) * 10 * s;
+            armSwing = Math.sin(time * 2) * 15 * s;
+        } else {
+            bob = Math.sin(time) * 2 * s;
+        }
+
         ctx.translate(0, bob);
 
-        // Legs
+        // Legs (Pants/Shoes)
         ctx.fillStyle = obj.outfitColor;
-        ctx.fillRect(-12 * s, 35 * s, 10 * s, 15 * s);
-        ctx.fillRect(2 * s, 35 * s, 10 * s, 15 * s);
+        // Left Leg
+        ctx.save();
+        ctx.translate(-8 * s, 35 * s);
+        ctx.rotate(legSwing * Math.PI / 180);
+        ctx.fillRect(-5 * s, 0, 10 * s, 15 * s);
+        // Shoe
+        ctx.fillStyle = '#333';
+        ctx.fillRect(-6 * s, 12 * s, 12 * s, 4 * s);
+        ctx.restore();
 
-        // Body
+        // Right Leg
         ctx.fillStyle = obj.outfitColor;
-        this.drawRoundRect(ctx, -20 * s, 0, 40 * s, 40 * s, 8 * s);
+        ctx.save();
+        ctx.translate(8 * s, 35 * s);
+        ctx.rotate(-legSwing * Math.PI / 180);
+        ctx.fillRect(-5 * s, 0, 10 * s, 15 * s);
+        // Shoe
+        ctx.fillStyle = '#333';
+        ctx.fillRect(-6 * s, 12 * s, 12 * s, 4 * s);
+        ctx.restore();
+
+        // Arms (Behind body)
+        ctx.fillStyle = obj.skinColor;
+        // Left Arm
+        ctx.save();
+        ctx.translate(-22 * s, 10 * s);
+        ctx.rotate(-armSwing * Math.PI / 180);
+        ctx.fillRect(-4 * s, 0, 8 * s, 25 * s);
+        ctx.restore();
+
+        // Right Arm
+        ctx.save();
+        ctx.translate(22 * s, 10 * s);
+        ctx.rotate(armSwing * Math.PI / 180);
+        ctx.fillRect(-4 * s, 0, 8 * s, 25 * s);
+        ctx.restore();
+
+        // Body (Shirt/Outfit)
+        ctx.fillStyle = obj.outfitColor;
+        this.drawRoundRect(ctx, -20 * s, 0, 40 * s, 40 * s, 10 * s);
+
+        // Neck
+        ctx.fillStyle = obj.skinColor;
+        ctx.fillRect(-5 * s, -5 * s, 10 * s, 10 * s);
 
         // Head
-        ctx.fillStyle = obj.skinColor;
         ctx.beginPath();
         ctx.arc(0, -22 * s, 18 * s, 0, Math.PI * 2);
         ctx.fill();
 
-        // Hair (if any)
+        // Hair
         if (obj.hairColor) {
             ctx.fillStyle = obj.hairColor;
             ctx.beginPath();
-            ctx.arc(0, -26 * s, 20 * s, Math.PI, 0);
+            ctx.arc(0, -25 * s, 20 * s, Math.PI, 0);
             ctx.fill();
+            // Sideburns / Back of hair
+            ctx.fillRect(-20 * s, -25 * s, 5 * s, 10 * s);
+            ctx.fillRect(15 * s, -25 * s, 5 * s, 10 * s);
         }
 
+        // Face Details
         // Eyes
-        ctx.fillStyle = '#000000';
+        ctx.fillStyle = '#fff';
         ctx.beginPath();
-        ctx.arc(-6 * s, -22 * s, 2 * s, 0, Math.PI * 2);
-        ctx.arc(6 * s, -22 * s, 2 * s, 0, Math.PI * 2);
+        ctx.arc(-7 * s, -23 * s, 4 * s, 0, Math.PI * 2);
+        ctx.arc(7 * s, -23 * s, 4 * s, 0, Math.PI * 2);
         ctx.fill();
 
-        // Mouth (simple smile)
-        ctx.strokeStyle = '#000000';
-        ctx.lineWidth = 1 * s;
+        ctx.fillStyle = '#000';
         ctx.beginPath();
-        ctx.arc(0, -18 * s, 5 * s, 0.2 * Math.PI, 0.8 * Math.PI);
+        ctx.arc(-7 * s, -23 * s, 2 * s, 0, Math.PI * 2);
+        ctx.arc(7 * s, -23 * s, 2 * s, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Smile
+        ctx.strokeStyle = '#000';
+        ctx.lineWidth = 1.5 * s;
+        ctx.beginPath();
+        ctx.arc(0, -18 * s, 6 * s, 0.1 * Math.PI, 0.9 * Math.PI);
         ctx.stroke();
 
         ctx.restore();
